@@ -185,16 +185,25 @@ long testRun(std::function<void (Matrix<int>&, Matrix<int>&, Matrix<int>&)>& f) 
 void test(std::string methodName, std::function<void (Matrix<int>&, Matrix<int>&, Matrix<int>&)> f) {
     std::vector<long> time(50);
 
-    for (auto i = 0; i < 50; i ++) {
+    int size = time.size();
+    for (auto i = 0; i < size; i ++) {
         time.emplace_back(testRun(f));
     }
 
     double avg = 0;
     for (auto& n : time)
         avg += n;
-    avg /= 50;
+    avg /= size;
 
-    std::cout << methodName << " : " << avg << " ms" << std::endl;
+    double d = 0;
+    for (auto& n : time)
+        d += pow(avg - n, 2);
+    d /= size == 1 ? 1 : size - 1;
+
+    double maxError = 2.58 * pow(d / size, 0.5);
+
+    std::cout << methodName << " : m = " << avg << " ms, d = " << d << std::endl;
+    std::cout << "99% interval: " << avg << " +- " << maxError << " ms" << std::endl << std::endl;
 }
 
 
